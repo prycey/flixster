@@ -3,6 +3,7 @@ package com.example.flixster;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.asynchttpclient.AsyncHttpClient;
+import com.example.flixster.databinding.ItemMovieBinding;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
    Context context;
@@ -27,8 +32,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         this.movies = movies;
     }
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View movieView = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
-        return new ViewHolder(movieView);
+        ItemMovieBinding binding = ItemMovieBinding.inflate(LayoutInflater.from(context), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -42,49 +47,57 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return movies.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView title;
-        TextView overview;
-        ImageView poster;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.title);
-            overview = itemView.findViewById(R.id.overview);
-            poster = itemView.findViewById(R.id.poster);
+    public class ViewHolder extends RecyclerView.ViewHolder {
+       ItemMovieBinding binding;
+       public ViewHolder(@NonNull ItemMovieBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
 
         }
 
         public void bind(movie movie) {
-            title.setText(movie.getTitle());
-            overview.setText(movie.getOverview());
+            binding.title.setText(movie.getTitle());
+            binding.overview.setText(movie.getOverview());
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
 
-            Glide.with(context).load(movie.getPosterPath()).into(poster);
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    // make sure the position is valid, i.e. actually exists in the view
+                    if (position != RecyclerView.NO_POSITION) {
+                        // get the movie at the position, this won't work if the class is static
+                        movie movie = movies.get(position);
+                        // create intent for the new activity
+                        Intent intent = new Intent(context, MovieDetailsActivity.class);
+                        // serialize the movie using parceler, use its short name as a key
+                        intent.putExtra(movie.class.getSimpleName(), Parcels.wrap(movie));
+                        // show the activity
+                        context.startActivity(intent);
+                    }
+
+                }
+
+            });
+
+            binding.poster.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AsyncHttpClient client = new AsyncHttpClient();
+                }
+            });
+
             int orientation = context.getResources().getConfiguration().orientation;
+            int radius = 40; // corner radius, higher value = more rounded
+            int margin = 5;
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Glide.with(context).load(movie.getPosterPath()).into(poster);
+                Glide.with(context).load(movie.getPosterPath()).transform(new RoundedCornersTransformation(radius, margin)).into(binding.poster);
                 // ...
             } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                Glide.with(context).load(movie.getBackdropPath()).into(poster);
+                Glide.with(context).load(movie.getBackdropPath()).transform(new RoundedCornersTransformation(radius, margin)).into(binding.poster);
                 // ...
             }
         }
 
-        @Override
-        public void onClick(View view) {
-            int position = getAdapterPosition();
-            // make sure the position is valid, i.e. actually exists in the view
-            if (position != RecyclerView.NO_POSITION) {
-                // get the movie at the position, this won't work if the class is static
-                movie movie = movies.get(position);
-                // create intent for the new activity
-                Intent intent = new Intent(context, MovieDetailsActivity.class);
-                // serialize the movie using parceler, use its short name as a key
-                intent.putExtra(movie.class.getSimpleName(), Parcels.wrap(movie));
-                // show the activity
-                context.startActivity(intent);
-            }
 
-        }
     }
 }

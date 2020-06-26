@@ -17,16 +17,20 @@ public class movie {
     String backdropPath;
     String title;
     String overview;
+    Double voteAverage;
+    Integer id;
+    String releaseDate;
 
     public movie(JSONObject jsonObject) throws JSONException {
         posterPath = jsonObject.getString("poster_path");
         backdropPath = jsonObject.getString("backdrop_path");
         title = jsonObject.getString("title");
         overview = jsonObject.getString("overview");
+        voteAverage = jsonObject.getDouble("vote_average");
+        id = jsonObject.getInt("id");
+        releaseDate = jsonObject.getString("release_date");
     }
-
-    public movie() {};
-
+    public movie() {}
     public static List<movie> fromJsonArray(JSONArray movieJsonArray) throws JSONException {
         List<movie> movies = new ArrayList<>();
         for(int i = 0; i < movieJsonArray.length(); i++){
@@ -38,6 +42,19 @@ public class movie {
     public String getOverview() {
         return overview;
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public String getReleaseDate() {
+        return "Release Date: " + releaseDate;
+    }
+
     public String getTitle() {
         return title;
     }

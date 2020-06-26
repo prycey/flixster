@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.example.flixster.databinding.ActivityMainBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,34 +28,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-         RecyclerView rvMovies = findViewById(R.id.rvMovies);
-         movies = new ArrayList<>();
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        movies = new ArrayList<>();
         final MovieAdapter movieAdapter = new MovieAdapter(this, movies);
-
-        rvMovies.setAdapter(movieAdapter);
-        rvMovies.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvMovies.setAdapter(movieAdapter);
+        binding.rvMovies.setLayoutManager(new LinearLayoutManager(this));
         AsyncHttpClient  client = new AsyncHttpClient();
-
         client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler(){
-
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 JSONObject jsonObject = json.jsonObject;
                 Log.d(TAG, "onSucess");
                 try{
                     JSONArray results = jsonObject.getJSONArray("results");
-                    Log.i(TAG, "Results:" + results.toString());
                     movies.addAll(movie.fromJsonArray(results));
                     movieAdapter.notifyDataSetChanged();
-                    Log.i(TAG, "Movies:" + movies.size());
-                    System.out.print(movies.toString());
                 }
                 catch(JSONException e){
                     Log.e(TAG, "Hit json exception", e);
                 }
             }
-
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.d(TAG, "onFailure");
