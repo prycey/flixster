@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#333232"
     android:layout_marginTop="10dp">
 
 
@@ -28,6 +29,7 @@
         android:layout_toEndOf="@+id/poster"
         android:layout_toRightOf="@+id/poster"
         android:text="TextView"
+        android:textColor="@android:color/white"
         android:textSize="24sp" />
 
     <TextView
@@ -39,6 +41,7 @@
         android:layout_marginTop="-8dp"
         android:layout_marginEnd="5dp"
         android:layout_toRightOf="@+id/poster"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>
